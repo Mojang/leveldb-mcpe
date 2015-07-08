@@ -8,7 +8,7 @@
 #define STORAGE_LEVELDB_PORT_PORT_POSIX_H_
 
 #undef PLATFORM_IS_LITTLE_ENDIAN
-#if defined(OS_MACOSX)
+#if defined(OS_MACOSX) || defined(OS_IOS)
   #include <machine/endian.h>
   #if defined(__DARWIN_LITTLE_ENDIAN) && defined(__DARWIN_BYTE_ORDER)
     #define PLATFORM_IS_LITTLE_ENDIAN \
@@ -52,7 +52,7 @@
 
 #if defined(OS_MACOSX) || defined(OS_SOLARIS) || defined(OS_FREEBSD) ||\
     defined(OS_NETBSD) || defined(OS_OPENBSD) || defined(OS_DRAGONFLYBSD) ||\
-    defined(OS_ANDROID) || defined(OS_HPUX) || defined(CYGWIN)
+    defined(OS_ANDROID) || defined(OS_HPUX) || defined(CYGWIN) || defined(OS_IOS)
 // Use fread/fwrite/fflush on platforms without _unlocked variants
 #define fread_unlocked fread
 #define fwrite_unlocked fwrite
@@ -60,7 +60,8 @@
 #endif
 
 #if defined(OS_MACOSX) || defined(OS_FREEBSD) ||\
-    defined(OS_OPENBSD) || defined(OS_DRAGONFLYBSD)
+    defined(OS_OPENBSD) || defined(OS_DRAGONFLYBSD)||\
+    defined(OS_IOS)
 // Use fsync() on platforms without fdatasync()
 #define fdatasync fsync
 #endif
