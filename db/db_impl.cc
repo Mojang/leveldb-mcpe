@@ -146,33 +146,45 @@ DBImpl::DBImpl(const Options& raw_options, const std::string& dbname)
 }
 
 DBImpl::~DBImpl() {
-  // Wait for background work to finish
-  mutex_.Lock();
-  suspending_compaction_.Release_Store(nullptr); // make sure that the suspend flag is clear
-  shutting_down_.Release_Store(this);  // Any non-NULL value is ok
-  while (bg_compaction_scheduled_) {
-    bg_cv_.Wait();
-  }
-  mutex_.Unlock();
+	Shutdown();
+}
 
-  if (db_lock_ != NULL) {
-    env_->UnlockFile(db_lock_);
-  }
+void DBImpl::Shutdown() {
+	// Wait for background work to finish
+	mutex_.Lock();
 
-  delete versions_;
-  if (mem_ != NULL) mem_->Unref();
-  if (imm_ != NULL) imm_->Unref();
-  delete tmp_batch_;
-  delete log_;
-  delete logfile_;
-  delete table_cache_;
+	// Skip shutdown if it already ran
+	if (shutting_down_.Acquire_Load() != nullptr) {
+		mutex_.Unlock();
 
-  if (owns_info_log_) {
-    delete options_.info_log;
-  }
-  if (owns_cache_) {
-    delete options_.block_cache;
-  }
+		return;
+	}
+
+	suspending_compaction_.Release_Store(nullptr); // make sure that the suspend flag is clear
+	shutting_down_.Release_Store(this);  // Any non-NULL value is ok
+	while (bg_compaction_scheduled_) {
+		bg_cv_.Wait();
+	}
+	mutex_.Unlock();
+
+	if (db_lock_ != NULL) {
+		env_->UnlockFile(db_lock_);
+	}
+
+	delete versions_;
+	if (mem_ != NULL) mem_->Unref();
+	if (imm_ != NULL) imm_->Unref();
+	delete tmp_batch_;
+	delete log_;
+	delete logfile_;
+	delete table_cache_;
+
+	if (owns_info_log_) {
+		delete options_.info_log;
+	}
+	if (owns_cache_) {
+		delete options_.block_cache;
+	}
 }
 
 Status DBImpl::NewDB() {
