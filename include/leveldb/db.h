@@ -55,6 +55,8 @@ class DLLX DB {
   DB() { }
   virtual ~DB();
 
+  virtual void Shutdown() = 0;
+
   // Set the database entry for "key" to "value".  Returns OK on success,
   // and a non-OK status on error.
   // Note: consider setting options.sync = true.
