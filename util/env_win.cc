@@ -600,6 +600,10 @@ namespace leveldb {
 
 	Env* Env::Default() {
 		PVOID lpContext;
+#ifdef MINGW
+                // this prevents a consistent crash in windows when using mingw
+                lpContext=NULL;
+#endif
 		InitOnceExecuteOnce(&g_InitOnce,          // One-time initialization structure
 			InitDefaultEnv,   // Pointer to initialization callback function
 			NULL,                 // Optional parameter to callback function (not used)

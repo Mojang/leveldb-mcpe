@@ -31,8 +31,13 @@
 #ifndef STORAGE_LEVELDB_PORT_PORT_WIN_H_
 #define STORAGE_LEVELDB_PORT_PORT_WIN_H_
 
-#define close _close
-#define fread_unlocked _fread_nolock
+#ifdef MINGW
+         // mingw will not link with _fread_nolock for some reason
+         #define fread_unlocked fread
+#else
+         #define close _close
+         #define fread_unlocked _fread_nolock
+#endif
 
 #include <string>
 #include <mutex>
