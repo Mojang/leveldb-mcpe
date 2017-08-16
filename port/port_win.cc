@@ -38,7 +38,7 @@
 #ifdef SNAPPY
 	#include <snappy/snappy.h>
 #elif defined(ZLIB)
-        #ifdef MINGW
+        #ifdef LEVELDB_MINGW
 	         #include <zlib.h>
         #else
                  #include <zlib/zlib.h>

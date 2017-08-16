@@ -31,7 +31,7 @@
 #ifndef STORAGE_LEVELDB_PORT_PORT_WIN_H_
 #define STORAGE_LEVELDB_PORT_PORT_WIN_H_
 
-#ifdef MINGW
+#ifdef LEVELDB_MINGW
          // mingw will not link with _fread_nolock for some reason
          #define fread_unlocked fread
 #else

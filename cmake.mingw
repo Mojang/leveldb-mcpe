@@ -1,8 +1,9 @@
-# NOTE -- this is ONLY for mingw32/64 builds
+# NOTE -- this is ONLY for mingw32/64 builds - and it only builds libleveldb.a
 
 # This file is not named properly by default so that non-mingw users do not use it accidentally.
 # To use it for mingw, rename this file to CMakeLists.txt
 # For convenience, you could "ln -s cmake.mingw CMakeLists.txt"
+
 
 # example usage:
 # > md wbuild
@@ -35,6 +36,9 @@ find_package(Threads REQUIRED)
 add_library(leveldb ${LEVELDB_SOURCES})
 target_include_directories(leveldb PUBLIC include ${CMAKE_CURRENT_BINARY_DIR})
 
-add_definitions(-Wall -std=c++11 -DDLLX= -fno-builtin-memcmp -pthread -DOS_WIN -DOS_WINDOWS -DWIN32 -DLEVELDB_ATOMIC_PRESENT -O2 -DNDEBUG -D_WIN32_WINDOWS=0x0600 -DWINVER=0x0600 -D_WIN32_WINNT=0x0600 -DMINGW)
+add_definitions(-Wall -std=c++11 -DDLLX= -pthread -DOS_WIN -DOS_WINDOWS -DWIN32 -DLEVELDB_ATOMIC_PRESENT -O2 -DNDEBUG -D_WIN32_WINDOWS=0x0600 -DWINVER=0x0600 -D_WIN32_WINNT=0x0600 -DLEVELDB_MINGW)
+
+# PLATFORM_SSEFLAGS=-msse4.2 -DLEVELDB_PLATFORM_POSIX_SSE
+add_definitions(-msse4.2 -DLEVELDB_PLATFORM_POSIX_SSE)
 
 include_directories(include .)
