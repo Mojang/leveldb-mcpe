@@ -916,10 +916,17 @@ Status VersionSet::Recover(bool *save_manifest) {
   if (!s.ok()) {
     return s;
   }
-  if (current.empty() || current[current.size()-1] != '\n') {
+  const size_t size = current.size();
+  if (size == 0 || (current[size - 1] != '\n' && current[size - 1] != '\r')) {
     return Status::Corruption("CURRENT file does not end with newline");
   }
-  current.resize(current.size() - 1);
+
+  int resizeSize = 1;
+  if (size >= 2 && current[size - 2] == '\r') {
+    resizeSize = 2;
+  }
+
+  current.resize(size - resizeSize);
 
   std::string dscname = dbname_ + "/" + current;
   SequentialFile* file;
