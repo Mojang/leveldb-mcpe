@@ -447,6 +447,26 @@ void leveldb_options_set_block_restart_interval(leveldb_options_t* opt, int n) {
   opt->rep.block_restart_interval = n;
 }
 
+// Acces to the compressor member of Options
+void leveldb_options_set_compressor(leveldb_options_t* opt, int i, int t) {
+  switch(t) {
+    case 0:
+      opt->rep.compressors[i] = nullptr;
+      break;
+#ifdef SNAPPY
+    case leveldb_snappy_compression:
+      opt->rep.compressors[i] = new leveldb::SnappyCompressor();
+      break;
+#endif
+    case leveldb_zlib_compression:
+      opt->rep.compressors[i] = new leveldb::ZlibCompressor();
+      break;
+    case leveldb_zlib_raw_compression:
+      opt->rep.compressors[i] = new leveldb::ZlibCompressorRaw();
+      break;
+  }
+}
+
 void leveldb_options_set_compression(leveldb_options_t* opt, int t) {
   switch(t) {
     case 0:
