@@ -62,7 +62,7 @@ namespace leveldb {
 				GetLastError(),                               // Hey Windows: Please explain this error!
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),  // Do it in the standard language
 				lpBuffer,              // Put the message here
-				sizeof(lpBuffer) - 1,                     // Number of bytes to store the message
+				(sizeof(lpBuffer) / sizeof(WCHAR)) - 1,     // Number of bytes to store the message
 				NULL);
 			return Status::IOError(name, ws2s(lpBuffer).c_str());
 		}
