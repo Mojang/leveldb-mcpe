@@ -57,12 +57,12 @@ namespace leveldb {
 
 		static Status GetLastWindowsError(const std::string& name) {
 			WCHAR lpBuffer[256] = L"?";
-			FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM,                 // It´s a system error
+			FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM,                 // It's a system error
 				NULL,                                      // No string to be formatted needed
 				GetLastError(),                               // Hey Windows: Please explain this error!
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),  // Do it in the standard language
 				lpBuffer,              // Put the message here
-				(sizeof(lpBuffer) / sizeof(WCHAR)) - 1,     // Number of characters to store the message
+				(sizeof(lpBuffer) / sizeof(WCHAR)),         // Number of characters to store the message
 				NULL);
 			return Status::IOError(name, ws2s(lpBuffer).c_str());
 		}
