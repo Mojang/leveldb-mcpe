@@ -163,17 +163,15 @@ Status Footer::DecodeFrom(Slice* input) {
 				return Status::NotSupported("encountered a block compressed with an unknown decompressor");
 			}
 
-			std::string buffer;
+			std::string *buffer = new std::string;
 			if (options.decompress_allocator) {
-				buffer = options.decompress_allocator->get();
+				*buffer = options.decompress_allocator->get();
 			}
 
-			bool success = compressor->decompress(data, n, buffer);
+			bool success = compressor->decompress(data, n, *buffer);
 
 			if (success) {
-				auto ubuf = new char[buffer.size()];
-				memcpy(ubuf, buffer.data(), buffer.size());
-				result->data = Slice(ubuf, buffer.size());
+				result->data = Slice(buffer->c_str(), buffer->size());
 				result->heap_allocated = true;
 				result->cachable = true;
 			}
@@ -181,10 +179,11 @@ Status Footer::DecodeFrom(Slice* input) {
 			delete[] buf;
 			
 			if (options.decompress_allocator) {
-				options.decompress_allocator->release(std::move(buffer));
+				options.decompress_allocator->release(std::move(*buffer));
 			}
 
 			if (!success) {
+				delete buffer;
 				return Status::Corruption("corrupted compressed block contents");
 			}
 		}
