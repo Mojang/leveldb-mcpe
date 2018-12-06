@@ -37,6 +37,7 @@
 #include <string>
 #include <mutex>
 #include <stdint.h>
+#include <cassert>
 
 namespace leveldb {
 	namespace port {
@@ -64,35 +65,30 @@ namespace leveldb {
 			}
 
 		private:
+			friend class CondVar;
 
 			std::mutex mutex;
-
-			// No copying
-			Mutex(const Mutex&) = delete;
-			void operator=(const Mutex&) = delete;
 		};
 
-		// the Win32 API offers a dependable condition variable mechanism, but only starting with
-		// Windows 2008 and Vista
-		// no matter what we will implement our own condition variable with a semaphore
-		// implementation as described in a paper written by Andrew D. Birrell in 2003
+		// Thinly wraps std::condition_variable.
 		class CondVar {
 		public:
-			explicit CondVar(Mutex* mu);
-			~CondVar();
-			void Wait();
-			void Signal();
-			void SignalAll();
+			explicit CondVar(Mutex* mu) : mu_(mu) { assert(mu != nullptr); }
+			~CondVar() = default;
+
+			CondVar(const CondVar&) = delete;
+			CondVar& operator=(const CondVar&) = delete;
+
+			void Wait() {
+				std::unique_lock<std::mutex> lock(mu_->mutex, std::adopt_lock);
+				cv_.wait(lock);
+				lock.release();
+			}
+			void Signal() { cv_.notify_one(); }
+			void SignalAll() { cv_.notify_all(); }
 		private:
-			Mutex* mu_;
-
-			Mutex wait_mtx_;
-			long waiting_;
-
-			void * sem1_;
-			void * sem2_;
-
-
+			std::condition_variable cv_;
+			Mutex* const mu_;
 		};
 
 		// Storage for a lock-free pointer
