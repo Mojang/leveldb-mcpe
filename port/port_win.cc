@@ -40,7 +40,11 @@
 #ifdef SNAPPY
 	#include <snappy/snappy.h>
 #elif defined(ZLIB)
-	#include <zlib/zlib.h>
+        #ifdef LEVELDB_MINGW
+	         #include <zlib.h>
+        #else
+                 #include <zlib/zlib.h>
+        #endif
 #endif
 
 namespace leveldb {

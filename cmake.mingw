@@ -1,0 +1,44 @@
+# NOTE -- this is ONLY for mingw32/64 builds - and it only builds libleveldb.a
+
+# This file is not named properly by default so that non-mingw users do not use it accidentally.
+# To use it for mingw, rename this file to CMakeLists.txt
+# For convenience, you could "ln -s cmake.mingw CMakeLists.txt"
+
+
+# example usage:
+# > md wbuild
+# > cd wbuild
+# > mingw32-cmake ..
+# > make
+
+# example usage:
+# > md wbuild64
+# > cd wbuild64
+# > mingw64-cmake ..
+# > make
+
+cmake_minimum_required(VERSION 3.0)
+project(libleveldb
+    VERSION 1.0)
+
+# hide this from includers.
+set(BUILD_SHARED_LIBS OFF)
+
+# include(GenerateExportHeader)
+
+set(LEVELDB_SOURCES
+  db/builder.cc db/c.cc db/dbformat.cc db/db_impl.cc db/db_iter.cc db/dumpfile.cc db/filename.cc db/log_reader.cc db/log_writer.cc db/memtable.cc db/repair.cc db/snappy_compressor.cc db/table_cache.cc db/version_edit.cc db/version_set.cc db/write_batch.cc db/zlib_compressor.cc db/zopfli_compressor.cc db/zstd_compressor.cc table/block_builder.cc table/block.cc table/filter_block.cc table/format.cc table/iterator.cc table/merger.cc table/table_builder.cc table/table.cc table/two_level_iterator.cc util/arena.cc util/bloom.cc util/cache.cc util/coding.cc util/comparator.cc util/crc32c.cc util/env.cc util/env_posix.cc util/env_win.cc util/env_winrt.cc util/filter_policy.cc util/hash.cc util/histogram.cc util/logging.cc util/options.cc util/status.cc util/win_logger.cc  port/port_win.cc port/port_posix_sse.cc)
+# note: env_boost.cc is excluded
+
+find_package(ZLIB REQUIRED)
+find_package(Threads REQUIRED)
+
+add_library(leveldb ${LEVELDB_SOURCES})
+target_include_directories(leveldb PUBLIC include ${CMAKE_CURRENT_BINARY_DIR})
+
+add_definitions(-Wall -std=c++11 -DDLLX= -pthread -DOS_WIN -DOS_WINDOWS -DWIN32 -DLEVELDB_ATOMIC_PRESENT -O2 -DNDEBUG -D_WIN32_WINDOWS=0x0600 -DWINVER=0x0600 -D_WIN32_WINNT=0x0600 -DLEVELDB_MINGW)
+
+# PLATFORM_SSEFLAGS=-msse4.2 -DLEVELDB_PLATFORM_POSIX_SSE
+add_definitions(-msse4.2 -DLEVELDB_PLATFORM_POSIX_SSE)
+
+include_directories(include .)
