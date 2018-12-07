@@ -90,7 +90,7 @@ namespace leveldb {
 		{
 			EnsureDirectory(fname);
 			std::wstring path = GetFullPath(fname);
-#ifdef MCPE_PLATFORM_WINRT
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP | WINAPI_PARTITION_SYSTEM) && (_WIN32_WINNT >= 0x0602)
 			CREATEFILE2_EXTENDED_PARAMETERS extraParams;
 			ZeroMemory(&extraParams, sizeof(extraParams));
 			extraParams.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
