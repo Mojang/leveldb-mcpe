@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
-#ifdef MCPE_PLATFORM_WINDOWS_FAMILY
+#if defined(LEVELDB_PLATFORM_WINDOWS)
 
 #define VC_EXTRALEAN            // Exclude rarely-used stuff
 #define WIN32_LEAN_AND_MEAN     // Exclude rarely-used stuff from Windows headers
