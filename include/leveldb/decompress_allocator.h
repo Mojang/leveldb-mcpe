@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef LEVELDB_DECOMPRESS_ALLOCATOR_H_
 #define LEVELDB_DECOMPRESS_ALLOCATOR_H_
 
@@ -7,10 +5,12 @@
 #include <vector>
 #include <string>
 
+#include "leveldb/export.h"
+
 namespace leveldb {
-	class DLLX DecompressAllocator {
+	class LEVELDB_EXPORT DecompressAllocator {
 	public:
-		virtual ~DecompressAllocator();
+		virtual ~DecompressAllocator() = default;
 
 		virtual std::string get();
 		virtual void release(std::string&& string);

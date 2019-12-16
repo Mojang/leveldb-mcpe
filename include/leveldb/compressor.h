@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LEVELDB_MCPE_INCLUDE_COMPRESSOR_H_
+#define LEVELDB_MCPE_INCLUDE_COMPRESSOR_H_
 
 #include <string>
 #include <cassert>
@@ -6,10 +7,12 @@
 #include <unordered_map>
 #include <memory>
 
-namespace leveldb {
-	class DLLX Slice;
+#include "leveldb/export.h"
 
-	class DLLX Compressor
+namespace leveldb {
+	class Slice;
+
+	class LEVELDB_EXPORT Compressor
 	{
 	public:
 
@@ -18,7 +21,7 @@ namespace leveldb {
 		//an ID that has to be unique across the whole system
 		const char uniqueCompressionID;
 
-        virtual ~Compressor() {}
+        virtual ~Compressor() = default;
         
 		Compressor(char uniqueCompressionID) :
 			uniqueCompressionID(uniqueCompressionID) {
@@ -58,3 +61,5 @@ namespace leveldb {
 	private:
 	};
 }
+
+#endif

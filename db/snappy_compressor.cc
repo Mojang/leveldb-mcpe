@@ -1,9 +1,10 @@
+#include "port/port.h"
 
-#ifdef SNAPPY
+#if HAVE_SNAPPY
+
+#include <snappy.h>
 
 #include "leveldb/snappy_compressor.h"
-
-#include <snappy/snappy.h>
 
 namespace leveldb {
 	void SnappyCompressor::compressImpl(const char* input, size_t length, ::std::string& output) const
@@ -14,7 +15,7 @@ namespace leveldb {
 		output.resize(outlen);
 	}
 
-	bool SnappyCompressor::decompress(const char* input, size_t length, std::string& output) const
+	bool SnappyCompressor::decompress(const char* input, size_t length, ::std::string& output) const
 	{
 		size_t ulength;
 		if (!snappy::GetUncompressedLength(input, length, &ulength))
