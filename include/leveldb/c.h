@@ -210,6 +210,9 @@ enum {
 };
 extern void leveldb_options_set_compression(leveldb_options_t*, int);
 
+// Acces to the compressor member of Options
+extern void leveldb_options_set_compressor(leveldb_options_t*, int, int);
+
 /* Comparator */
 
 extern leveldb_comparator_t* leveldb_comparator_create(
