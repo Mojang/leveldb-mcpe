@@ -40,6 +40,8 @@
 #include <cassert>
 #include <condition_variable>
 
+typedef ptrdiff_t ssize_t;
+
 namespace leveldb {
 	namespace port {
 

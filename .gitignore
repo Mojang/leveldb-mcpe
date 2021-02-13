@@ -7,3 +7,13 @@ build_config.mk
 *_test
 db_bench
 leveldbutil
+bin/
+
+CMakeCache*
+*.cmake
+CMakeFiles*
+
+# build
+build*/
+Win32/
+leveldb.dir/
