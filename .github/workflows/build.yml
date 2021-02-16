@@ -1,0 +1,33 @@
+name: Build
+on: push
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    container: centos:7
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependenicies
+        run: |
+          yum -y install file gcc gcc-c++ make zlib-devel
+      - name: Build
+        run: |
+          make
+          strip out-shared/libleveldb.so.1.20
+          file out-shared/libleveldb.so.1.20
+          ldd out-shared/libleveldb.so.1.20
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          path: out-shared/libleveldb.so*
+          name: libleveldb.so
+  macos:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: make
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          path: out-shared/libleveldb.dylib*
+          name: libleveldb.dylib
