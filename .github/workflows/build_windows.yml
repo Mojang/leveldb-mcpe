@@ -1,0 +1,90 @@
+name: Build
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy-win32:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout zlib
+      uses: actions/checkout@v2
+      with:
+        repository: madler/zlib
+        path: zlib
+
+    - name: Build zlib
+      shell: cmd
+      run: |
+        cd zlib
+        cmake -G "Visual Studio 16 2019" -A Win32
+        cmake --build . --config Release
+        cd ..
+
+    - name: Checkout leveldb
+      uses: actions/checkout@v2
+      with:
+        path: leveldb-mcpe
+        
+    - name: Build leveldb
+      shell: cmd
+      run: |
+        mkdir build_leveldb
+        cd build_leveldb
+        cmake -DZLIB_INCLUDE_DIR="..\zlib" -DZLIB_LIBRARY="..\zlib\Release\zlibstatic.lib" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -G "Visual Studio 16 2019" -A Win32 ..\leveldb-mcpe
+        cmake --build . --config Release
+        cd ..
+    
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./build_leveldb/Release/leveldb.dll
+        asset_name: LevelDB-MCPE-32.dll
+        asset_content_type: dll
+        
+  deploy-win64:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout zlib
+      uses: actions/checkout@v2
+      with:
+        repository: madler/zlib
+        path: zlib
+
+    - name: Build zlib
+      shell: cmd
+      run: |
+        cd zlib
+        cmake -G "Visual Studio 16 2019" -A x64
+        cmake --build . --config Release
+        cd ..
+
+    - name: Checkout leveldb
+      uses: actions/checkout@v2
+      with:
+        path: leveldb-mcpe
+        
+    - name: Build leveldb
+      shell: cmd
+      run: |
+        mkdir build_leveldb
+        cd build_leveldb
+        cmake -DZLIB_INCLUDE_DIR="..\zlib" -DZLIB_LIBRARY="..\zlib\Release\zlibstatic.lib" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -G "Visual Studio 16 2019" -A x64 ..\leveldb-mcpe
+        cmake --build . --config Release
+        cd ..
+    
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./build_leveldb/Release/leveldb.dll
+        asset_name: LevelDB-MCPE-64.dll
+        asset_content_type: dll
