@@ -1,33 +1,69 @@
 name: Build
-on: push
+
+on:
+  release:
+    types: [published]
+
 jobs:
   linux:
     runs-on: ubuntu-latest
     container: centos:7
     steps:
-      - uses: actions/checkout@v2
       - name: Install dependenicies
         run: |
-          yum -y install file gcc gcc-c++ make zlib-devel
-      - name: Build
-        run: |
-          make
-          strip out-shared/libleveldb.so.1.20
-          file out-shared/libleveldb.so.1.20
-          ldd out-shared/libleveldb.so.1.20
-      - name: Upload
-        uses: actions/upload-artifact@v2
+          yum -y install file gcc gcc-c++ make unzip
+      - name: Install CMake
+        uses: lukka/get-cmake@latest
+        
+      - name: Checkout zlib
+        uses: actions/checkout@v2
         with:
-          path: out-shared/libleveldb.so*
-          name: libleveldb.so
+          repository: madler/zlib
+          path: zlib
+
+      - name: Build zlib
+        run: |
+          cd zlib
+          cmake -GNinja -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+          cmake --build . --config Release
+          cd ..
+        
+      - name: Checkout leveldb
+        uses: actions/checkout@v2
+        with:
+          path: leveldb-mcpe
+        
+      - name: Build leveldb
+        run: |
+          cmake -DZLIB_INCLUDE_DIR="zlib" -DZLIB_LIBRARY="/__w/leveldb-mcpe/leveldb-mcpe/zlib/libz.a" -GNinja leveldb-mcpe
+          cmake --build . --config Release
+          strip libleveldb.so
+          file libleveldb.so
+          ldd libleveldb.so
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: libleveldb.so
+          asset_name: libleveldb.so
+          asset_content_type: so
+
   macos:
     runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
       - name: Build
         run: make
-      - name: Upload
-        uses: actions/upload-artifact@v2
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          path: out-shared/libleveldb.dylib*
-          name: libleveldb.dylib
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: out-shared/libleveldb.dylib
+          asset_name: libleveldb.dylib
+          asset_content_type: dylib
