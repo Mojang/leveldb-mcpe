@@ -917,13 +917,16 @@ Status VersionSet::Recover(bool *save_manifest) {
     return s;
   }
   const size_t size = current.size();
-  if (size == 0 || (current[size - 1] != '\n' && current[size - 1] != '\r')) {
-    return Status::Corruption("CURRENT file does not end with newline");
+  if (size == 0) {
+    return Status::Corruption("CURRENT file is empty");
   }
-
-  int resizeSize = 1;
-  if (size >= 2 && current[size - 2] == '\r') {
-    resizeSize = 2;
+  
+  int resizeSize = 0;
+  while (current[size - resizeSize - 1] == '\n' || current[size - resizeSize - 1] == '\r') {
+    resizeSize += 1;
+    if (size <= resizeSize) {
+      return Status::Corruption("CURRENT file is empty");
+    }
   }
 
   current.resize(size - resizeSize);
